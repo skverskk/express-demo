@@ -1,0 +1,28 @@
+{
+  "name": "express-demo",
+  "version": "1.0.0",
+  "description": "Express Demo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ken Skversky",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "csurf": "^1.9.0",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "express-winston": "^2.5.1",
+    "helmet": "^3.12.0",
+    "joi": "^13.1.2",
+    "jsonwebtoken": "^8.2.1",
+    "mongoose": "^5.0.15",
+    "morgan": "^1.9.0",
+    "winston": "^2.4.1"
+  }
+}
