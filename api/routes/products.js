@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Product = require('../models/product');
 const router = express.Router();
+const checkAuth = require('../auth/check-auth');
 
 
 router.get('/',  (req, res, next) => {
@@ -18,7 +19,7 @@ router.get('/',  (req, res, next) => {
                     _id: doc._id,
                     request : {
                         type: 'GET',
-                        url: process.env.URL + ":" + process.env.PORT + "/products" + doc._id
+                        url: process.env.URL + ":" + process.env.PORT + "/products/" + doc._id
                     }
                 }
             })
@@ -36,11 +37,18 @@ router.get('/',  (req, res, next) => {
 router.get('/:id',  (req, res, next) => {
     const id = req.params.id;
     Product.findById(id)
+    .select( 'name price _id')
     .exec() 
     .then( doc => {
         console.log("From Database", doc);
         if( doc ) {
-            res.status(200).json(doc);
+           res.status(200).json({
+               request: {
+                product: doc,
+                description: 'Get All Products',
+                url: process.env.URL + ":" + process.env.PORT + "/products"
+               }
+           });
         } else {
             res.status(404).json({
                 message: 'No Valid Entry for this Id'
@@ -55,7 +63,7 @@ router.get('/:id',  (req, res, next) => {
     });
 });
 
-router.post('/',  (req, res, next) => {
+router.post('/', checkAuth,  (req, res, next) => {
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -73,7 +81,7 @@ router.post('/',  (req, res, next) => {
                 id: result._id,
                 request: {
                     type: 'GET',
-                    url: process.env.URL + ":" + process.env.PORT + result._id
+                    url: process.env.URL + ":" + process.env.PORT + "/products/" +  result._id
                 }
             }
     })
@@ -84,7 +92,7 @@ router.post('/',  (req, res, next) => {
     }); 
 });
 
-router.patch('/:id',  (req, res, next) => {
+router.patch('/:id', checkAuth, (req, res, next) => {
    const id = req.params.id;
    const updateOps = {};
    for( const ops of req.body ) {
@@ -94,7 +102,13 @@ router.patch('/:id',  (req, res, next) => {
    .exec()
    .then( result => {
        console.log(result);
-       res.status(200).json(result);
+       res.status(200).json({
+           message: 'Product Successfully Updated',
+           request: {
+               type: 'GET',
+               url: process.env.URL + ":" + process.env.PORT + "/products/" + id
+           }
+       });
    })
    .catch( err => {
        console.log(err);
@@ -104,12 +118,19 @@ router.patch('/:id',  (req, res, next) => {
    });
 });
 
-router.delete('/:id',  (req, res, next) => {
+router.delete('/:id', checkAuth, (req, res, next) => {
     const id = req.params.id;
     Product.remove({_id: id})
     .exec()
     .then( result => {
-        res.status(200).json(result);
+        res.status(200).json({
+            message: 'Product Successfully Deleted',
+            request: {
+                type: 'POST',
+                url: process.env.URL + ":" + process.env.PORT + "/products",
+                body: { name: 'String', price: 'Number'} 
+            }
+        });
     })
     .catch( err => {
         console.log(err)

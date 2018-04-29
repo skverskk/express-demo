@@ -14,10 +14,13 @@ const mongoose = require('mongoose');
 mongoose.connect("mongodb://" + process.env.DB_USER + ":" + process.env.DB_PWD + "@ds011308.mlab.com:11308/products")
 .then(() => console.log('MongoDB Connected...'))
 .catch( err => console.log(err));
+mongoose.Promise = global.Promise;
   
 
 const productsRoute = require('./api/routes/products');
 const ordersRoute = require('./api/routes/orders');
+const userRoute = require('./api/routes/user');
+
 
 
 const app = express();
@@ -45,6 +48,8 @@ next();
 // app.use('/api', course);
 app.use('/products', productsRoute);
 app.use('/orders', ordersRoute);
+app.use('/user', userRoute);
+
 
 // Error Handling
 app.use((req, res, next) => {
